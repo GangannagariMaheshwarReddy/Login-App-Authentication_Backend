@@ -1,34 +1,35 @@
 package com.example.LoginappBackend;
 
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-@Component
-public class LoginServiceImplemenration implements LoginService{
-	
-	LoginRepositry loginRepository;
-	
+@Service
+public class LoginServiceImplemenration implements LoginService {
 
-	public LoginServiceImplemenration(LoginRepositry loginRepository) {
-		super();
-		this.loginRepository = loginRepository;
-	}
+    @Autowired
+    private LoginRepositry repo;
 
+    @Override
+    public boolean validateUser(String username, String password) {
+        User user = repo.findByUsername(username);
+        return user != null && user.getPassword().equals(password);
+    }
 
-	@Override
-	public boolean validateUser(String username, String password) {
-		
-		User user = loginRepository.findByUsername(username);
-		
-		if(user == null) {
-			return false;
-		}
-		
-		else {
-			if(user.password.equals(password)) {
-				return true;
-			}
-			return false;
-		}
-	}
+    @Override
+    public int getSalary(String username) {
+        User user = repo.findByUsername(username);
+        return user != null ? user.getSalary() : 0;
+    }
+    
+    @Override
+    public boolean userExists(String username) {
+        return repo.findByUsername(username) != null;
+    }
 
+    @Override
+    public void registerUser(String username, String password, int salary) {
+        User user = new User(username, password, salary);
+        repo.save(user);
+    }
+    
 }
